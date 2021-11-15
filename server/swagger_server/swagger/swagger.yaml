@@ -9,8 +9,6 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
-- url: https://virtserver.swaggerhub.com/ProValdi/preprocessor/1.0.0
-  description: SwaggerHub API Auto Mocking
 - url: https://localhost:8080/MIPT-2PC/preprocessor/0.1.0
   description: SwaggerHub API Auto Mocking
 tags:

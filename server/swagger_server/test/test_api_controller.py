@@ -19,7 +19,7 @@ class TestApiController(BaseTestCase):
         Get previous results
         """
         response = self.client.open(
-            '/ProValdi/preprocessor/1.0.0/results',
+            '/MIPT-2PC/preprocessor/0.1.0/results',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -31,7 +31,7 @@ class TestApiController(BaseTestCase):
         """
         body = Nums()
         response = self.client.open(
-            '/ProValdi/preprocessor/1.0.0/operate',
+            '/MIPT-2PC/preprocessor/0.1.0/operate',
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
