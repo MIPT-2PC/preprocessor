@@ -36,6 +36,8 @@ paths:
                 x-content-type: application/json
         "400":
           description: Invalid input
+        "500":
+          description: Computation Error
       x-openapi-router-controller: swagger_server.controllers.api_controller
   /results:
     get:
