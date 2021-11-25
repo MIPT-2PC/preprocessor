@@ -7,18 +7,6 @@ is an example of building a swagger-enabled Flask server.
 
 This example uses the [Connexion](https://github.com/zalando/connexion) library on top of Flask.
 
-## Run
-
-```
-cd server
-python3 setup.py install --user
-pip3 install -r requirements.txt
-python3 setup.py install --user
-export BALANCER_PORT=8080 # port for server to run
-python3 -m swagger_server
-```
-
-
 ## Requirements
 Python 3.5.2+
 
