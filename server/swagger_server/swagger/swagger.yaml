@@ -34,7 +34,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Nums'
                 x-content-type: application/json
-        "405":
+        "400":
           description: Invalid input
       x-openapi-router-controller: swagger_server.controllers.api_controller
   /results:
@@ -54,8 +54,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Results'
                 x-content-type: application/json
-        "400":
-          description: Invalid status value
+        "404":
+          description: No data
       x-openapi-router-controller: swagger_server.controllers.api_controller
 components:
   schemas:
