@@ -14,7 +14,6 @@ class Nums(Model):
 
     Do not edit the class manually.
     """
-
     def __init__(self, num1: float=None, num2: float=None, operation: str=None):  # noqa: E501
         """Nums - a model defined in Swagger
 
@@ -36,7 +35,6 @@ class Nums(Model):
             'num2': 'num2',
             'operation': 'operation'
         }
-
         self._num1 = num1
         self._num2 = num2
         self._operation = operation
