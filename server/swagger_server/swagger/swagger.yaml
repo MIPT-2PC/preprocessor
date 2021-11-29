@@ -1,111 +1,111 @@
-openapi: 3.0.0
+---
+swagger: "2.0"
 info:
-  title: Preprocessor server
-  description: This is a simple API
+  description: "This is a sample server Petstore server.  You can find out more about\
+    \     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,\
+    \ #swagger](http://swagger.io/irc/).      For this sample, you can use the api\
+    \ key `special-key` to test the authorization     filters."
+  version: "1.0.0"
+  title: "Swagger Balancer"
+  termsOfService: "http://swagger.io/terms/"
   contact:
-    email: mipt@mipt.ru
+    email: "apiteam@swagger.io"
   license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
-servers:
-- url: https://localhost:8080/MIPT-2PC/preprocessor/0.1.0
-  description: SwaggerHub API Auto Mocking
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "virtserver.swaggerhub.com"
+basePath: "/ProValdi/server/1.0.0"
 tags:
-- name: api
-  description: operate 2 numbers
+- name: "summ"
+  description: "Summ 2 numbers"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
 paths:
   /operate:
     post:
       tags:
-      - api
-      summary: operate 2 numbers
-      description: operate 2 numbers with defined action
-      operationId: operate
-      requestBody:
-        $ref: '#/components/requestBodies/Nums'
+      - "summ"
+      summary: "operate 2 numbers"
+      description: ""
+      operationId: "do_action"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "2 numbers to operate with"
+        required: true
+        schema:
+          $ref: "#/definitions/Nums"
       responses:
-        "200":
-          description: Success computation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Nums'
-                x-content-type: application/json
-        "400":
-          description: Invalid input
-        "500":
-          description: Computation Error
-      x-openapi-router-controller: swagger_server.controllers.api_controller
+        "405":
+          description: "Invalid input"
+      x-swagger-router-controller: "swagger_server.controllers.summ_controller"
   /results:
     get:
       tags:
-      - api
-      summary: Get previous results
-      description: retrieve results
-      operationId: get_results
+      - "summ"
+      summary: "Get previous results"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "get_results"
+      produces:
+      - "application/json"
+      parameters: []
       responses:
         "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Results'
-                x-content-type: application/json
-        "404":
-          description: No data
-      x-openapi-router-controller: swagger_server.controllers.api_controller
-components:
-  schemas:
-    Results:
-      type: object
-      properties:
-        result:
-          type: number
-          format: double
-          example: 13
-        input:
-          type: string
-          example: 12+1
-      example:
-        result: 13
-        input: 12+1
-    Nums:
-      required:
-      - num1
-      - num2
-      - operation
-      type: object
-      properties:
-        num1:
-          type: number
-          format: double
-          example: 12
-        num2:
-          type: number
-          format: double
-          example: 1
-        operation:
-          type: string
-          description: Types of operations
-          example: +
-          enum:
-          - +
-          - "-"
-          - '*'
-      example:
-        num1: 12
-        operation: +
-        num2: 1
-  requestBodies:
-    Nums:
-      description: Nums request body
-      content:
-        application/json:
+          description: "successful operation"
           schema:
-            $ref: '#/components/schemas/Nums'
-
+            type: "array"
+            items:
+              $ref: "#/definitions/Results"
+        "400":
+          description: "Invalid status value"
+      x-swagger-router-controller: "swagger_server.controllers.summ_controller"
+definitions:
+  Nums:
+    type: "object"
+    properties:
+      num1:
+        type: "number"
+        format: "double"
+        example: 12
+      num2:
+        type: "number"
+        format: "double"
+        example: 1
+      operation:
+        type: "string"
+        example: "add"
+        description: "Types of operations"
+        enum:
+        - "+"
+        - "-"
+        - "*"
+    xml:
+      name: "Nums"
+    example:
+      num1: 12
+      operation: "add"
+      num2: 1
+  Results:
+    type: "object"
+    properties:
+      result:
+        type: "number"
+        format: "double"
+        example: 13
+      input:
+        type: "string"
+        example: "12+1"
+    example:
+      result: 13
+      input: "12+1"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

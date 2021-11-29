@@ -14,6 +14,7 @@ class Results(Model):
 
     Do not edit the class manually.
     """
+
     def __init__(self, result: float=None, input: str=None):  # noqa: E501
         """Results - a model defined in Swagger
 
@@ -31,6 +32,7 @@ class Results(Model):
             'result': 'result',
             'input': 'input'
         }
+
         self._result = result
         self._input = input
 
