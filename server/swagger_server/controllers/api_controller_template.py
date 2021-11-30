@@ -25,7 +25,7 @@ def operate(body=None):  # noqa: E501
     :param body: Nums request body
     :type body: dict | bytes
 
-    :rtype: List[Nums]
+    :rtype: List[Results]
     """
     if connexion.request.is_json:
         body = Nums.from_dict(connexion.request.get_json())  # noqa: E501

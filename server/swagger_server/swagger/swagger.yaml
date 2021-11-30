@@ -38,13 +38,14 @@ paths:
           description: Invalid input
         "500":
           description: Computation Error
+      x-openapi-router-controller: swagger_server.controllers.api_controller
   /results:
     get:
       tags:
       - api
       summary: Get previous results
       description: retrieve results
-      operationId: getResults
+      operationId: get_results
       responses:
         "200":
           description: successful operation
@@ -54,9 +55,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Results'
-                x-content-type: application/Json
+                x-content-type: application/json
         "404":
           description: No data
+      x-openapi-router-controller: swagger_server.controllers.api_controller
 components:
   schemas:
     Results:
@@ -69,6 +71,9 @@ components:
         input:
           type: string
           example: 12+1
+      example:
+        result: 13
+        input: 12+1
     Nums:
       required:
       - num1
@@ -99,3 +104,4 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Nums'
+
