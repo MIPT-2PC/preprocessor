@@ -54,5 +54,5 @@ def operate(body=None):  # noqa: E501
             ServerDictInst.add(resultsObject)
         except:
             return {}, 500
-        return resultsObject, 200
+        return [resultsObject], 200
     return {}, 400
