@@ -32,20 +32,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Nums'
+                  $ref: '#/components/schemas/Results'
                 x-content-type: application/json
         "400":
           description: Invalid input
         "500":
           description: Computation Error
-      x-openapi-router-controller: swagger_server.controllers.api_controller
   /results:
     get:
       tags:
       - api
       summary: Get previous results
       description: retrieve results
-      operationId: get_results
+      operationId: getResults
       responses:
         "200":
           description: successful operation
@@ -55,10 +54,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Results'
-                x-content-type: application/json
+                x-content-type: application/Json
         "404":
           description: No data
-      x-openapi-router-controller: swagger_server.controllers.api_controller
 components:
   schemas:
     Results:
@@ -71,9 +69,6 @@ components:
         input:
           type: string
           example: 12+1
-      example:
-        result: 13
-        input: 12+1
     Nums:
       required:
       - num1
@@ -97,10 +92,6 @@ components:
           - +
           - "-"
           - '*'
-      example:
-        num1: 12
-        operation: +
-        num2: 1
   requestBodies:
     Nums:
       description: Nums request body
@@ -108,4 +99,3 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Nums'
-
