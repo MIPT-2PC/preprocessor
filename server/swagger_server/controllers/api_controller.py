@@ -7,7 +7,6 @@ from swagger_server.models.nums import Nums  # noqa: E501
 from swagger_server.models.results import Results  # noqa: E501
 from swagger_server import util
 
-results = {}
 from ..config import *
 
 def get_results():  # noqa: E501
