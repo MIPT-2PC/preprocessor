@@ -68,6 +68,8 @@ class Nums(Model):
         :param num1: The num1 of this Nums.
         :type num1: float
         """
+        if num1 is None:
+            raise ValueError("Invalid value for `num1`, must not be `None`")  # noqa: E501
 
         self._num1 = num1
 
@@ -89,6 +91,8 @@ class Nums(Model):
         :param num2: The num2 of this Nums.
         :type num2: float
         """
+        if num2 is None:
+            raise ValueError("Invalid value for `num2`, must not be `None`")  # noqa: E501
 
         self._num2 = num2
 
