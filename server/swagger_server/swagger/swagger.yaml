@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Preprocessor server
-  description: This is a simple API
+  title: Preprocessor API
+  description: This is MIPT-2PC preprocessor API
   contact:
     email: mipt@mipt.ru
   license:
@@ -12,18 +12,18 @@ servers:
 - url: http://localhost:8080/MIPT-2PC/preprocessor/1.0.0
   description: SwaggerHub API Auto Mocking
 tags:
-- name: api
+- name: interaction
   description: operate 2 numbers
 paths:
-  /operate:
+  /start2PC:
     post:
       tags:
-      - api
-      summary: operate 2 numbers
-      description: operate 2 numbers with defined action
-      operationId: operate
+      - interaction
+      summary: start preprocessing procedure
+      description: send config file to start preprocessing
+      operationId: start2PC
       requestBody:
-        $ref: '#/components/requestBodies/Nums'
+        $ref: '#/components/requestBodies/Table'
       responses:
         "200":
           description: Success computation
@@ -32,76 +32,95 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Results'
+                  $ref: '#/components/schemas/Table'
                 x-content-type: application/json
+              examples:
+                tableExample:
+                  $ref: '#/components/examples/preprocessedTableExample'
         "400":
           description: Invalid input
         "500":
           description: Computation Error
-      x-openapi-router-controller: swagger_server.controllers.api_controller
-  /results:
+  /getTable:
     get:
       tags:
-      - api
-      summary: Get previous results
-      description: retrieve results
-      operationId: get_results
+      - interaction
+      summary: hello message to get preprocessed data
+      description: "Returns preprocessed table for this user, masked input and outputs"
+      operationId: getTable
       responses:
         "200":
-          description: successful operation
+          description: Data preprocessed successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Results'
-                x-content-type: application/json
-        "404":
-          description: No data
-      x-openapi-router-controller: swagger_server.controllers.api_controller
+                  $ref: '#/components/schemas/Table'
+              examples:
+                tableExample:
+                  $ref: '#/components/examples/preprocessedTableExample'
+        "500":
+          description: Preprocessing procedure hasn't been initiated
 components:
   schemas:
-    Results:
+    Table:
       type: object
-      properties:
-        result:
-          type: number
-          format: double
-          example: 13
-        input:
-          type: string
-          example: 12+1
+      format: json
       example:
-        result: 13
-        input: 12+1
-    Nums:
-      required:
-      - num1
-      - num2
-      - operation
-      type: object
-      properties:
-        num1:
-          type: number
-          format: double
-          example: 12
-        num2:
-          type: number
-          format: double
-          example: 1
-        operation:
-          type: string
-          description: Types of operations
-          example: +
-          enum:
-          - +
-          - "-"
-          - '*'
+        config:
+          numOfLinks:
+          - "292"
+          numOfNodes:
+          - "125"
+          AinputBitness:
+          - "32"
+          BinputBitness:
+          - "32"
+          resultBitness:
+          - "33"
+        node1:
+          inn: 2
+          out: 1
+          inList:
+          - "51"
+          - "50"
+          outList:
+          - "12261"
+          operation:
+          - XOR
+  examples:
+    preprocessedTableExample:
+      summary: Preprocessed table example
+      value:
+        config:
+          numOfLinks:
+          - "292"
+          numOfNodes:
+          - "125"
+          masksBitness:
+          - "32"
+          inputMasks:
+          - "12"
+          outputMasks:
+          - "24"
+        node1:
+          inn: 2
+          out: 1
+          inList:
+          - "51"
+          - "50"
+          outList:
+          - "12261"
+          operation:
+          - "0"
+          - "1"
+          - "1"
+          - "0"
   requestBodies:
-    Nums:
+    Table:
       description: Nums request body
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Nums'
-
+            $ref: '#/components/schemas/Table'
