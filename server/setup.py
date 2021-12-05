@@ -17,10 +17,10 @@ REQUIRES = ["connexion"]
 setup(
     name=NAME,
     version=VERSION,
-    description="Preprocessor server",
+    description="Preprocessor API",
     author_email="mipt@mipt.ru",
     url="",
-    keywords=["Swagger", "Preprocessor server"],
+    keywords=["Swagger", "Preprocessor API"],
     install_requires=REQUIRES,
     packages=find_packages(),
     package_data={'': ['swagger/swagger.yaml']},
@@ -28,6 +28,6 @@ setup(
     entry_points={
         'console_scripts': ['swagger_server=swagger_server.__main__:main']},
     long_description="""\
-    This is a simple API
+    This is MIPT-2PC preprocessor API
     """
 )
