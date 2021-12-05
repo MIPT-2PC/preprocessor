@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: Preprocessor API
+  description: This is MIPT-2PC preprocessor API
+  contact:
+    email: mipt@mipt.ru
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: http://localhost:8080/MIPT-2PC/preprocessor/1.0.0
+  description: SwaggerHub API Auto Mocking
+tags:
+- name: interaction
+  description: operate 2 numbers
+paths:
+  /start2PC:
+    post:
+      tags:
+      - interaction
+      summary: start preprocessing procedure
+      description: send config file to start preprocessing
+      operationId: start2_pc
+      requestBody:
+        $ref: '#/components/requestBodies/Table'
+      responses:
+        "200":
+          description: Success computation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Table'
+                x-content-type: application/json
+              examples:
+                tableExample:
+                  $ref: '#/components/examples/preprocessedTableExample'
+        "400":
+          description: Invalid input
+        "500":
+          description: Computation Error
+      x-openapi-router-controller: swagger_server.controllers.interaction_controller
+  /getTable:
+    get:
+      tags:
+      - interaction
+      summary: hello message to get preprocessed data
+      description: "Returns preprocessed table for this user, masked input and outputs"
+      operationId: get_table
+      responses:
+        "200":
+          description: Data preprocessed successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Table'
+                x-content-type: application/json
+              examples:
+                tableExample:
+                  $ref: '#/components/examples/preprocessedTableExample'
+        "500":
+          description: Preprocessing procedure hasn't been initiated
+      x-openapi-router-controller: swagger_server.controllers.interaction_controller
+components:
+  schemas:
+    Table:
+      type: object
+      format: json
+      example:
+        config:
+          numOfLinks: "292"
+          numOfNodes: "125"
+          AinputBitness: "32"
+          BinputBitness: "32"
+          resultBitness: "33"
+        node1:
+          inn: 2
+          out: 1
+          inList:
+          - "51"
+          - "50"
+          outList:
+          - "12261"
+          operation:
+          - XOR
+  examples:
+    preprocessedTableExample:
+      summary: Preprocessed table example
+      value:
+        config:
+          numOfLinks: "292"
+          numOfNodes: "125"
+          masksBitness: "32"
+          inputMasks: "12"
+          outputMasks: "24"
+        node1:
+          inn: 2
+          out: 1
+          inList:
+          - "51"
+          - "50"
+          outList:
+          - "12261"
+          operation:
+          - "0"
+          - "1"
+          - "1"
+          - "0"
+  requestBodies:
+    Table:
+      description: Nums request body
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Table'
+
