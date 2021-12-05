@@ -21,7 +21,7 @@ paths:
       - interaction
       summary: start preprocessing procedure
       description: send config file to start preprocessing
-      operationId: start2_pc
+      operationId: start2PC
       requestBody:
         $ref: '#/components/requestBodies/Table'
       responses:
@@ -41,14 +41,13 @@ paths:
           description: Invalid input
         "500":
           description: Computation Error
-      x-openapi-router-controller: swagger_server.controllers.interaction_controller
   /getTable:
     get:
       tags:
       - interaction
       summary: hello message to get preprocessed data
       description: "Returns preprocessed table for this user, masked input and outputs"
-      operationId: get_table
+      operationId: getTable
       responses:
         "200":
           description: Data preprocessed successfully
@@ -58,13 +57,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Table'
-                x-content-type: application/json
               examples:
                 tableExample:
                   $ref: '#/components/examples/preprocessedTableExample'
         "500":
           description: Preprocessing procedure hasn't been initiated
-      x-openapi-router-controller: swagger_server.controllers.interaction_controller
 components:
   schemas:
     Table:
@@ -72,16 +69,11 @@ components:
       format: json
       example:
         config:
-          numOfLinks:
-          - "292"
-          numOfNodes:
-          - "125"
-          AinputBitness:
-          - "32"
-          BinputBitness:
-          - "32"
-          resultBitness:
-          - "33"
+          numOfLinks: "292"
+          numOfNodes: "125"
+          AinputBitness: "32"
+          BinputBitness: "32"
+          resultBitness: "33"
         node1:
           inn: 2
           out: 1
@@ -97,16 +89,11 @@ components:
       summary: Preprocessed table example
       value:
         config:
-          numOfLinks:
-          - "292"
-          numOfNodes:
-          - "125"
-          masksBitness:
-          - "32"
-          inputMasks:
-          - "12"
-          outputMasks:
-          - "24"
+          numOfLinks: "292"
+          numOfNodes: "125"
+          masksBitness: "32"
+          inputMasks: "12"
+          outputMasks: "24"
         node1:
           inn: 2
           out: 1
@@ -127,4 +114,3 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Table'
-
