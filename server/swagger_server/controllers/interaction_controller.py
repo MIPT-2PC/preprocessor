@@ -4,10 +4,10 @@ import six
 from swagger_server.models.table import Table  # noqa: E501
 from swagger_server import util
 
-
 from ..config import *
 import copy
 
+PreprocessorRoutineInst = PreprocessorRoutine()
 
 def get_table():  # noqa: E501
     """hello message to get preprocessed data
@@ -17,7 +17,19 @@ def get_table():  # noqa: E501
 
     :rtype: List[Table]
     """
-    return 'do some magic!'
+
+    PreprocessorRoutineInst.ClientBTrigger = True
+
+    while PreprocessorRoutineInst.ClientATrigger == False or PreprocessorRoutineInst.ClientBTrigger == False:
+        # тут должен быть таймер, а по таймауту возвращать:
+        # return "Computation Error", 500
+        continue
+    outputTableForClientA = PreprocessorRoutineInst.outputTableForClientA
+    #PreprocessorRoutineInst.clearInstance() # надо почистить то, что насчитали
+    # Проблема в том, что нужно чистить инстанс только после того, как оба запроса вернули ответ
+    # Поэтому нужно придумать что-нибудь, что будет триггериться только после того, как оба респонза отправятся
+    # мб таймер, мб потоки какие-нибудь, я хз
+    return outputTableForClientA, 200
 
 
 def start2_pc(body=None):  # noqa: E501
@@ -33,14 +45,27 @@ def start2_pc(body=None):  # noqa: E501
     if connexion.request.is_json:
         body = Table.from_dict(connexion.request.get_json())  # noqa: E501
 
-    ConfigParserInstance = ConfigParser(body)
+    ConfigParserInstance = ConfigParser(body)  # надо добавить валидацию на ошибки для входных данных
+    # после валидации можно дёрнуть триггер, что клиент А начал процедуру препроцессинга:
+
+    PreprocessorRoutineInst.ClientATrigger = True
+
     # обращаемся к полям класса парсера для работы с ними
     # можно создать дополнительные переменные для удобного доступа к ним напрямую, а не через инстанс класса парсера
     print(ConfigParserInstance.nodes[0])
     print(ConfigParserInstance.numOfLinks)
 
     '''
-        do some magic with data
+        По идее тут нужно сделать так, под капотом:
+        
+        outputTableForClientA = PreprocessorRoutineInst.processTables(ConfigParserInstance)
+        
+        потом в конце сразу эту штуку и возвращаем
+    
+        я пока прямо в этой функции все сделаю
+    
+        create masks, tables for A
+        create masks, tables for B
     '''
 
     # предположим, что мы написали алгоритм, тогда смотрим, в каком формате нужно вернуть Response:
@@ -54,7 +79,8 @@ def start2_pc(body=None):  # noqa: E501
 
     # Сейчас, для примера, я верну фейковые данные, но в правильном формате
 
-    nodes = copy.deepcopy(ConfigParserInstance.nodes) # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
+    nodes = copy.deepcopy(
+        ConfigParserInstance.nodes)  # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
     nodes[0].operation = [0] * 4
 
     nodes[0].operation[0] = "1"
@@ -99,4 +125,13 @@ def start2_pc(body=None):  # noqa: E501
         outputTableForClientA['node' + str(i + 1)] = {}
         outputTableForClientA['node' + str(i + 1)].update(nodesDictFromSimpleNamespace.pop())
 
+    PreprocessorRoutineInst.outputTableForClientA = outputTableForClientA
+
+    while PreprocessorRoutineInst.ClientATrigger == False or PreprocessorRoutineInst.ClientBTrigger == False:
+        # тут должен быть таймер, а по таймауту возвращать:
+        # return "Computation Error", 500
+        continue
+
+    outputTableForClientA = PreprocessorRoutineInst.outputTableForClientA
+    # PreprocessorRoutineInst.clearInstance() # надо почистить то, что насчитали
     return outputTableForClientA, 200
