@@ -31,6 +31,15 @@ class ConfigParser:
 
 class PreprocessorRoutine:
     serverdict = []
+    ClientATrigger = False
+    ClientBTrigger = False
+    outputTableForClientA = {}
+
+    def clearInstance(self):
+        self.serverdict = []
+        self.ClientATrigger = False
+        self.ClientBTrigger = False
+        self.outputTableForClientA = {}
 
 '''
 это сохранено для дальшейшей разработки
