@@ -21,7 +21,7 @@ paths:
       - interaction
       summary: start preprocessing procedure
       description: send config file to start preprocessing
-      operationId: start2PC
+      operationId: start2_pc
       requestBody:
         $ref: '#/components/requestBodies/Table'
       responses:
@@ -41,13 +41,14 @@ paths:
           description: Invalid input
         "500":
           description: Computation Error
+      x-openapi-router-controller: swagger_server.controllers.interaction_controller
   /getTable:
     get:
       tags:
       - interaction
       summary: hello message to get preprocessed data
       description: "Returns preprocessed table for this user, masked input and outputs"
-      operationId: getTable
+      operationId: get_table
       responses:
         "200":
           description: Data preprocessed successfully
@@ -57,11 +58,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Table'
+                x-content-type: application/json
               examples:
                 tableExample:
                   $ref: '#/components/examples/preprocessedTableExample'
         "500":
           description: Preprocessing procedure hasn't been initiated
+      x-openapi-router-controller: swagger_server.controllers.interaction_controller
 components:
   schemas:
     Table:
@@ -117,3 +120,4 @@ components:
           schema:
             $ref: '#/components/schemas/Table'
           x-content-type: application/json
+

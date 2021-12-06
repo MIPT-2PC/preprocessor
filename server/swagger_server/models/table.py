@@ -14,15 +14,20 @@ class Table(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self):  # noqa: E501
+    def __init__(self, payload: object=None):  # noqa: E501
         """Table - a model defined in Swagger
 
+        :param payload: The payload of this Table.  # noqa: E501
+        :type payload: object
         """
         self.swagger_types = {
+            'payload': object
         }
 
         self.attribute_map = {
+            'payload': 'payload'
         }
+        self._payload = payload
 
     @classmethod
     def from_dict(cls, dikt) -> 'Table':
@@ -34,3 +39,24 @@ class Table(Model):
         :rtype: Table
         """
         return util.deserialize_model(dikt, cls)
+
+    @property
+    def payload(self) -> object:
+        """Gets the payload of this Table.
+
+
+        :return: The payload of this Table.
+        :rtype: object
+        """
+        return self._payload
+
+    @payload.setter
+    def payload(self, payload: object):
+        """Sets the payload of this Table.
+
+
+        :param payload: The payload of this Table.
+        :type payload: object
+        """
+
+        self._payload = payload
