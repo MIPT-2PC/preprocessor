@@ -3,6 +3,7 @@ import six
 
 from swagger_server.models.table import Table  # noqa: E501
 from swagger_server import util
+from flask import Flask, Response
 
 from ..config import *
 import copy
@@ -24,12 +25,12 @@ def get_table():  # noqa: E501
         # тут должен быть таймер, а по таймауту возвращать:
         # return "Computation Error", 500
         continue
-    outputTableForClientA = PreprocessorRoutineInst.outputTableForClientA
-    #PreprocessorRoutineInst.clearInstance() # надо почистить то, что насчитали
-    # Проблема в том, что нужно чистить инстанс только после того, как оба запроса вернули ответ
-    # Поэтому нужно придумать что-нибудь, что будет триггериться только после того, как оба респонза отправятся
-    # мб таймер, мб потоки какие-нибудь, я хз
-    return outputTableForClientA, 200
+
+    def generate():
+        yield str([PreprocessorRoutineInst.outputTableForClientA]).replace("\'", "\"")
+        PreprocessorRoutineInst.clearInstance()
+        yield ''
+    return Response(generate(), mimetype='application/json'), 200
 
 
 def start2_pc(body=None):  # noqa: E501
@@ -70,11 +71,10 @@ def start2_pc(body=None):  # noqa: E501
 
     # предположим, что мы написали алгоритм, тогда смотрим, в каком формате нужно вернуть Response:
     # https://app.swaggerhub.com/apis/ProValdi/preprocessor/1.0.0#/interaction/start2PC
-    # вернуть нужно List[Table], но Table задан просто как {}, поэтому тупа возвращаем сгенерированный джейсон,
-    # даже без []
+    # вернуть нужно List[Table], но Table задан просто как {}, поэтому тупа возвращаем сгенерированный [джейсон],
     # Например, на основе результатов алгоритма мы сгенерировали ответ в виде json, пусть это переменная outputTableForClientA
     # тогда Response будет выглядеть так:
-    # return outputTableForClientA, 200
+    # return [outputTableForClientA], 200
     # чуть позже добавим обработку ошибок (коды 400, 500)
 
     # Сейчас, для примера, я верну фейковые данные, но в правильном формате
@@ -132,6 +132,8 @@ def start2_pc(body=None):  # noqa: E501
         # return "Computation Error", 500
         continue
 
-    outputTableForClientA = PreprocessorRoutineInst.outputTableForClientA
-    # PreprocessorRoutineInst.clearInstance() # надо почистить то, что насчитали
-    return outputTableForClientA, 200
+    def generate():
+        yield str([PreprocessorRoutineInst.outputTableForClientA]).replace("\'", "\"")
+        PreprocessorRoutineInst.clearInstance()
+        yield ''
+    return Response(generate(), mimetype='application/json'), 200
