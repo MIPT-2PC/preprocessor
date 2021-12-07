@@ -3,7 +3,7 @@ info:
   title: Preprocessor API
   description: This is MIPT-2PC preprocessor API
   contact:
-    email: mipt@mipt.ru
+    email: prokhorov.va@phystech.edu
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -69,7 +69,6 @@ components:
   schemas:
     Table:
       type: object
-      format: json
       example:
         config:
           numOfLinks: "292"
@@ -117,4 +116,5 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Table'
+          x-content-type: application/json
 

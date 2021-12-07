@@ -18,7 +18,7 @@ setup(
     name=NAME,
     version=VERSION,
     description="Preprocessor API",
-    author_email="mipt@mipt.ru",
+    author_email="prokhorov.va@phystech.edu",
     url="",
     keywords=["Swagger", "Preprocessor API"],
     install_requires=REQUIRES,
