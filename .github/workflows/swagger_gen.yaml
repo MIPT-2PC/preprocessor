@@ -2,9 +2,9 @@ name: Swagger code generator
 
 on: 
   push:
-    branches: [main, develop]
+    branches: [main, develop, Max]
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, Max]
 
 jobs:
   generate:
