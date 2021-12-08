@@ -79,8 +79,7 @@ def start2_pc(body=None):  # noqa: E501
 
     # Сейчас, для примера, я верну фейковые данные, но в правильном формате
 
-    nodes = copy.deepcopy(
-        ConfigParserInstance.nodes)  # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
+    nodes = copy.deepcopy(ConfigParserInstance.nodes)  # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
     nodes[0].operation = [0] * 4
 
     nodes[0].operation[0] = "1"
