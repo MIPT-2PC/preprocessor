@@ -18,6 +18,7 @@ class ConfigParser:
         self.BinputBitness = int(configSection.BinputBitness) # количество бит клиента B
         self.resultBitness = int(configSection.resultBitness) # количество бит результата
 
+
         self.nodes = [0] * self.numOfNodes
 
         '''
