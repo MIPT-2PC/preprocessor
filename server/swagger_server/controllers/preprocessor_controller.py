@@ -10,6 +10,17 @@ import copy
 
 PreprocessorRoutineInst = PreprocessorRoutine()
 
+
+import random
+
+def generateInput(N):
+  i = 0
+  input=[]
+  for i in range(N):
+    input.append(random.randint(0, 1))
+  return input
+
+
 def get_table():  # noqa: E501
     """hello message to get preprocessed data
 
@@ -19,17 +30,26 @@ def get_table():  # noqa: E501
     :rtype: List[Table]
     """
 
+    print("get_table was triggered by ClientB")
+
     PreprocessorRoutineInst.ClientBTrigger = True
 
+    '''
     while PreprocessorRoutineInst.ClientATrigger == False or PreprocessorRoutineInst.ClientBTrigger == False:
         # тут должен быть таймер, а по таймауту возвращать:
         # return "Computation Error", 500
         continue
+    '''
+    while (PreprocessorRoutineInst.ClientATrigger == False):
+        continue
+
+    print("get_table is unlocked")
 
     def generate():
         yield str([PreprocessorRoutineInst.outputTableForClientA]).replace("\'", "\"")
         PreprocessorRoutineInst.clearInstance()
         yield ''
+
     return Response(generate(), mimetype='application/json'), 200
 
 
@@ -54,17 +74,20 @@ def start2_pc(body=None):  # noqa: E501
     # обращаемся к полям класса парсера для работы с ними
     # можно создать дополнительные переменные для удобного доступа к ним напрямую, а не через инстанс класса парсера
     print(ConfigParserInstance.nodes[0])
+    print(ConfigParserInstance.nodes[0].inn)
+    print(ConfigParserInstance.nodes[0].out)
+    print(ConfigParserInstance.nodes[0].inList)
     print(ConfigParserInstance.numOfLinks)
 
     '''
         По идее тут нужно сделать так, под капотом:
-        
+
         outputTableForClientA = PreprocessorRoutineInst.processTables(ConfigParserInstance)
-        
+
         потом в конце сразу эту штуку и возвращаем
-    
+
         я пока прямо в этой функции все сделаю
-    
+
         create masks, tables for A
         create masks, tables for B
     '''
@@ -80,12 +103,38 @@ def start2_pc(body=None):  # noqa: E501
     # Сейчас, для примера, я верну фейковые данные, но в правильном формате
 
     nodes = copy.deepcopy(ConfigParserInstance.nodes)  # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
+    '''
+    linksMasks = [0] * ConfigParserInstance.numOfLinks
+
+    for i in range(ConfigParserInstance.numOfLinks):
+        linksMasks[i] = random.randint(0, 1)
+
+    linksMasks[i]^
+
+    for i in range (ConfigParserInstance.numOfNodes):
+        nodesA[i].operation[0] = input[i]
+        nodesA[i].operation[1] = input[i]
+        nodesA[i].operation[2] = input[i]
+        nodesA[i].operation[3] = input[i]
+
+    for i in range(ConfigParserInstance.numOfNodes):
+        nodesB[i].operation[0] = input[i]
+        nodesB[i].operation[1] = input[i]
+        nodesB[i].operation[2] = input[i]
+        nodesB[i].operation[3] = input[i]
+    '''
     nodes[0].operation = [0] * 4
+    nodes[1].operation = [0] * 4
 
     nodes[0].operation[0] = "1"
     nodes[0].operation[1] = "0"
     nodes[0].operation[2] = "1"
     nodes[0].operation[3] = "0"
+
+    nodes[1].operation[0] = "1"
+    nodes[1].operation[1] = "0"
+    nodes[1].operation[2] = "1"
+    nodes[1].operation[3] = "0"
 
     configForOutputTableA = {}
     configForOutputTableA['config'] = {
@@ -106,11 +155,24 @@ def start2_pc(body=None):  # noqa: E501
         00000000.00000000.00000000.00001100 - точкой разделил для удобства
         Как быстро достать бит и применить его? Очень просто:
         inputMasks >> i & 1 - получим i-й бит справа (нумерация с нуля)
+        
+          00000000.00000000.00000000.000011 
+        00000000.00000000.00000000.00000001 
     '''
+
+    masks = [0] * 32
+
+    for i in range(32):
+        masks[i] = int(configForOutputTableA['config']['inputMasks']) >> i & 1
+
+    masks.reverse()
+    print(masks)
+
 
     # до этого nodes был объектом типа namespace, нам же нужно получить обратно питоновский словарь
     # на самом деле вернётся list из одного словаря, поэтому потом словарь нужно будет получить методом .pop()
-    nodesDictFromSimpleNamespace = json.loads(json.dumps(ConfigParserInstance.nodes, default=lambda s: vars(s)))
+    nodesDictFromSimpleNamespace = json.loads(json.dumps(nodes, default=lambda s: vars(s)))
+    print(nodesDictFromSimpleNamespace)
 
     outputTableForClientA = {}
     outputTableForClientA['config'] = {
@@ -126,13 +188,18 @@ def start2_pc(body=None):  # noqa: E501
 
     PreprocessorRoutineInst.outputTableForClientA = outputTableForClientA
 
-    while PreprocessorRoutineInst.ClientATrigger == False or PreprocessorRoutineInst.ClientBTrigger == False:
+    print("start_2pc went successful and now while loop")
+
+    PreprocessorRoutineInst.ClientATrigger = True
+
+    '''while PreprocessorRoutineInst.ClientATrigger == False or PreprocessorRoutineInst.ClientBTrigger == False:
         # тут должен быть таймер, а по таймауту возвращать:
         # return "Computation Error", 500
         continue
-
+        '''
+    print("start_2pc is unlocked")
     def generate():
         yield str([PreprocessorRoutineInst.outputTableForClientA]).replace("\'", "\"")
-        PreprocessorRoutineInst.clearInstance()
         yield ''
+
     return Response(generate(), mimetype='application/json'), 200

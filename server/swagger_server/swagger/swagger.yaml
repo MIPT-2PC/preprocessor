@@ -12,13 +12,13 @@ servers:
 - url: http://localhost:8080/MIPT-2PC/preprocessor/1.0.0
   description: SwaggerHub API Auto Mocking
 tags:
-- name: interaction
+- name: preprocessor
   description: operate 2 numbers
 paths:
   /start2PC:
     post:
       tags:
-      - interaction
+      - preprocessor
       summary: start preprocessing procedure
       description: send config file to start preprocessing
       operationId: start2_pc
@@ -41,11 +41,11 @@ paths:
           description: Invalid input
         "500":
           description: Computation Error
-      x-openapi-router-controller: swagger_server.controllers.interaction_controller
+      x-openapi-router-controller: swagger_server.controllers.preprocessor_controller
   /getTable:
     get:
       tags:
-      - interaction
+      - preprocessor
       summary: hello message to get preprocessed data
       description: "Returns preprocessed table for this user, masked input and outputs"
       operationId: get_table
@@ -64,7 +64,7 @@ paths:
                   $ref: '#/components/examples/preprocessedTableExample'
         "500":
           description: Preprocessing procedure hasn't been initiated
-      x-openapi-router-controller: swagger_server.controllers.interaction_controller
+      x-openapi-router-controller: swagger_server.controllers.preprocessor_controller
 components:
   schemas:
     Table:
