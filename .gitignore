@@ -1,2 +1,13 @@
+# dev tools
 .idea/
 venv/
+# binaries
+../client_of_preprocessor.egg-info/
+*.egg-info/
+build/
+dist/
+# test files
+config.scheme
+config.txt
+config.json
+parser.py

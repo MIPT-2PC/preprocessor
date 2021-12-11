@@ -35,12 +35,14 @@ class PreprocessorRoutine:
     ClientATrigger = False
     ClientBTrigger = False
     outputTableForClientA = {}
+    outputTableForClientB = {}
 
     def clearInstance(self):
         self.serverdict = []
         self.ClientATrigger = False
         self.ClientBTrigger = False
         self.outputTableForClientA = {}
+        self.outputTableForClientB = {}
 
 '''
 это сохранено для дальшейшей разработки
