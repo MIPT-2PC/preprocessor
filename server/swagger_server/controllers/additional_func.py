@@ -51,6 +51,6 @@ def matrix_B_Creation(result_A, keys_list, wires, operation):
             result_B.append(B[i][2])
     if len(wires) == 2:
         for i in range(len(B)):
-            B[i][2] = result_A[i] ^ (keys_list[int(wires[1])] ^ operations[operation](B[i][0] ^ keys_list[int(wires[0])], B[i][1] ^ keys_list[int(wires[0])]))
+            B[i][2] = result_A[i] ^ (keys_list[int(wires[1])] ^ operations[operation](B[i][0] ^ keys_list[int(wires[0])], B[i][0] ^ keys_list[int(wires[0])]))
             result_B.append(B[i][2])
     return result_B

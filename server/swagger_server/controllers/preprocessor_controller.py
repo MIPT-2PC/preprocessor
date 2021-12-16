@@ -24,12 +24,6 @@ def get_table():  # noqa: E501
 
     PreprocessorRoutineInst.ClientBTrigger = True
 
-    '''
-    while PreprocessorRoutineInst.ClientATrigger == False or PreprocessorRoutineInst.ClientBTrigger == False:
-        # тут должен быть таймер, а по таймауту возвращать:
-        # return "Computation Error", 500
-        continue
-    '''
     while (PreprocessorRoutineInst.ClientATrigger == False):
         continue
 
@@ -61,23 +55,7 @@ def start2_pc(body=None):  # noqa: E501
 
     PreprocessorRoutineInst.ClientATrigger = True
 
-    #print(ConfigParserInstance.nodes[0])
-    #print(ConfigParserInstance.nodes[0].inn)
-    #print(ConfigParserInstance.nodes[0].out)
-    #print(ConfigParserInstance.nodes[0].inList)
-    #print(ConfigParserInstance.numOfLinks)
-
-    # предположим, что мы написали алгоритм, тогда смотрим, в каком формате нужно вернуть Response:
-    # https://app.swaggerhub.com/apis/ProValdi/preprocessor/1.0.0#/interaction/start2PC
-    # вернуть нужно List[Table], но Table задан просто как {}, поэтому тупа возвращаем сгенерированный [джейсон],
-    # Например, на основе результатов алгоритма мы сгенерировали ответ в виде json, пусть это переменная outputTableForClientA
-    # тогда Response будет выглядеть так:
-    # return [outputTableForClientA], 200
-    # чуть позже добавим обработку ошибок (коды 400, 500)
-
-    # Сейчас, для примера, я верну фейковые данные, но в правильном формате
-
-    nodesA = copy.deepcopy(ConfigParserInstance.nodes)  # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
+    nodesA = copy.deepcopy(ConfigParserInstance.nodes)
     nodesB = copy.deepcopy(ConfigParserInstance.nodes)
 
     list_of_masks = generateInput(ConfigParserInstance.numOfLinks)
@@ -92,8 +70,7 @@ def start2_pc(body=None):  # noqa: E501
         nodesA[i].operation[2] = result_A[2]
         nodesA[i].operation[3] = result_A[3]
 
-        result_B = matrix_B_Creation(result_A, list_of_masks, nodesA[i].inList + nodesA[i].outList,
-                                     ConfigParserInstance.nodes[i].operation)
+        result_B = matrix_B_Creation(result_A, list_of_masks, nodesA[i].inList + nodesA[i].outList, ConfigParserInstance.nodes[i].operation)
         nodesB[i].operation[0] = result_B[0]
         nodesB[i].operation[1] = result_B[1]
         nodesB[i].operation[2] = result_B[2]
@@ -102,23 +79,20 @@ def start2_pc(body=None):  # noqa: E501
     inputMasksForA = 0
     inputMasksForB = 0
     for i in range(ConfigParserInstance.AinputBitness):
-        inputMasksForA = inputMasksForA << list_of_masks[i] | 1
-        inputMasksForB = inputMasksForB << list_of_masks[i + 32] | 1
+        inputMasksForA |= list_of_masks[i] << i  # LSB
+        inputMasksForB |= list_of_masks[i + ConfigParserInstance.AinputBitness] << i
 
-    stri = ""
-    for i in reversed(range(int(ConfigParserInstance.numOfLinks))):
-        if i < int(ConfigParserInstance.numOfLinks) - int(ConfigParserInstance.resultBitness):
-            break
-        stri = stri + str(list_of_masks[i])
-    out = int(stri, 2)
+    out = 0
+    for i in range(ConfigParserInstance.resultBitness):
+        out |= list_of_masks[ConfigParserInstance.numOfLinks - 1 - i] << i  # LSB
 
     outputTableForClientA = {}
     outputTableForClientA['config'] = {
         "numOfLinks": str(ConfigParserInstance.numOfLinks),
         "numOfNodes": str(ConfigParserInstance.numOfNodes),
         "masksBitness": str(ConfigParserInstance.AinputBitness),
-        "inputMasks": str(inputMasksForA),  # см описание ниже
-        "outputMasks": str(out)  # см описание ниже
+        "inputMasks": str(inputMasksForA),  # LSB
+        "outputMasks": str(out)  # LSB
     }
 
     outputTableForClientB = {}
@@ -126,34 +100,14 @@ def start2_pc(body=None):  # noqa: E501
         "numOfLinks": str(ConfigParserInstance.numOfLinks),
         "numOfNodes": str(ConfigParserInstance.numOfNodes),
         "masksBitness": str(ConfigParserInstance.BinputBitness),
-        "inputMasks": str(inputMasksForB),  # см описание ниже
-        "outputMasks": str(out)  # см описание ниже
+        "inputMasks": str(inputMasksForB),  # LSB
+        "outputMasks": str(out)  # LSB
     }
 
-    #print(outputTableForClientA)
-    #print(outputTableForClientB)
-
-    '''
-        вместо того, чтобы передавать массив маскирующих битов, можно сэкономить память и передать 
-        десятичное число, которое кодирует эти маскируюшие биты
-        12 = 1100
-        с дополнением до 32 битов (согласно конфигу - maskBitness):
-        00000000.00000000.00000000.00001100 - точкой разделил для удобства
-        Как быстро достать бит и применить его? Очень просто:
-        inputMasks >> i & 1 - получим i-й бит справа (нумерация с нуля)
-        
-          00000000.00000000.00000000.000011 
-        00000000.00000000.00000000.00000001 
-    '''
-
-    # до этого nodes был объектом типа namespace, нам же нужно получить обратно питоновский словарь
-    # на самом деле вернётся list из одного словаря, поэтому потом словарь нужно будет получить методом .pop()
     nodesDictFromSimpleNamespaceB = json.loads(json.dumps(nodesB, default=lambda s: vars(s)))
     nodesDictFromSimpleNamespaceA = json.loads(json.dumps(nodesA, default=lambda s: vars(s)))
-    #print(nodesDictFromSimpleNamespaceA)
-    #print(nodesDictFromSimpleNamespaceB)
 
-    for i in range(ConfigParserInstance.numOfNodes):
+    for i in reversed(range(ConfigParserInstance.numOfNodes)):
         outputTableForClientA['node' + str(i + 1)] = {}
         outputTableForClientA['node' + str(i + 1)].update(nodesDictFromSimpleNamespaceA.pop())
 
