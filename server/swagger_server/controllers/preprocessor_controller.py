@@ -4,6 +4,7 @@ import six
 from swagger_server.models.table import Table  # noqa: E501
 from swagger_server import util
 from flask import Flask, Response
+from .additional_func import *
 
 from ..config import *
 import copy
@@ -11,21 +12,10 @@ import copy
 PreprocessorRoutineInst = PreprocessorRoutine()
 
 
-import random
-
-def generateInput(N):
-  i = 0
-  input=[]
-  for i in range(N):
-    input.append(random.randint(0, 1))
-  return input
-
-
 def get_table():  # noqa: E501
     """hello message to get preprocessed data
 
     Returns preprocessed table for this user, masked input and outputs # noqa: E501
-
 
     :rtype: List[Table]
     """
@@ -46,7 +36,7 @@ def get_table():  # noqa: E501
     print("get_table is unlocked")
 
     def generate():
-        yield str([PreprocessorRoutineInst.outputTableForClientA]).replace("\'", "\"")
+        yield str([PreprocessorRoutineInst.outputTableForClientB]).replace("\'", "\"")
         PreprocessorRoutineInst.clearInstance()
         yield ''
 
@@ -71,26 +61,11 @@ def start2_pc(body=None):  # noqa: E501
 
     PreprocessorRoutineInst.ClientATrigger = True
 
-    # обращаемся к полям класса парсера для работы с ними
-    # можно создать дополнительные переменные для удобного доступа к ним напрямую, а не через инстанс класса парсера
-    print(ConfigParserInstance.nodes[0])
-    print(ConfigParserInstance.nodes[0].inn)
-    print(ConfigParserInstance.nodes[0].out)
-    print(ConfigParserInstance.nodes[0].inList)
-    print(ConfigParserInstance.numOfLinks)
-
-    '''
-        По идее тут нужно сделать так, под капотом:
-
-        outputTableForClientA = PreprocessorRoutineInst.processTables(ConfigParserInstance)
-
-        потом в конце сразу эту штуку и возвращаем
-
-        я пока прямо в этой функции все сделаю
-
-        create masks, tables for A
-        create masks, tables for B
-    '''
+    #print(ConfigParserInstance.nodes[0])
+    #print(ConfigParserInstance.nodes[0].inn)
+    #print(ConfigParserInstance.nodes[0].out)
+    #print(ConfigParserInstance.nodes[0].inList)
+    #print(ConfigParserInstance.numOfLinks)
 
     # предположим, что мы написали алгоритм, тогда смотрим, в каком формате нужно вернуть Response:
     # https://app.swaggerhub.com/apis/ProValdi/preprocessor/1.0.0#/interaction/start2PC
@@ -102,50 +77,61 @@ def start2_pc(body=None):  # noqa: E501
 
     # Сейчас, для примера, я верну фейковые данные, но в правильном формате
 
-    nodes = copy.deepcopy(ConfigParserInstance.nodes)  # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
-    '''
-    linksMasks = [0] * ConfigParserInstance.numOfLinks
+    nodesA = copy.deepcopy(ConfigParserInstance.nodes)  # просто присваивать не стоит, ...ance.node - копируется ссылка на объект SimpleNamespace
+    nodesB = copy.deepcopy(ConfigParserInstance.nodes)
 
-    for i in range(ConfigParserInstance.numOfLinks):
-        linksMasks[i] = random.randint(0, 1)
-
-    linksMasks[i]^
-
-    for i in range (ConfigParserInstance.numOfNodes):
-        nodesA[i].operation[0] = input[i]
-        nodesA[i].operation[1] = input[i]
-        nodesA[i].operation[2] = input[i]
-        nodesA[i].operation[3] = input[i]
+    list_of_masks = generateInput(ConfigParserInstance.numOfLinks)
 
     for i in range(ConfigParserInstance.numOfNodes):
-        nodesB[i].operation[0] = input[i]
-        nodesB[i].operation[1] = input[i]
-        nodesB[i].operation[2] = input[i]
-        nodesB[i].operation[3] = input[i]
-    '''
-    nodes[0].operation = [0] * 4
-    nodes[1].operation = [0] * 4
+        nodesA[i].operation = [0] * 4
+        nodesB[i].operation = [0] * 4
 
-    nodes[0].operation[0] = "1"
-    nodes[0].operation[1] = "0"
-    nodes[0].operation[2] = "1"
-    nodes[0].operation[3] = "0"
+        result_A = result_Creation()
+        nodesA[i].operation[0] = result_A[0]
+        nodesA[i].operation[1] = result_A[1]
+        nodesA[i].operation[2] = result_A[2]
+        nodesA[i].operation[3] = result_A[3]
 
-    nodes[1].operation[0] = "1"
-    nodes[1].operation[1] = "0"
-    nodes[1].operation[2] = "1"
-    nodes[1].operation[3] = "0"
+        result_B = matrix_B_Creation(result_A, list_of_masks, nodesA[i].inList + nodesA[i].outList,
+                                     ConfigParserInstance.nodes[i].operation)
+        nodesB[i].operation[0] = result_B[0]
+        nodesB[i].operation[1] = result_B[1]
+        nodesB[i].operation[2] = result_B[2]
+        nodesB[i].operation[3] = result_B[3]
 
-    configForOutputTableA = {}
-    configForOutputTableA['config'] = {
+    inputMasksForA = 0
+    inputMasksForB = 0
+    for i in range(ConfigParserInstance.AinputBitness):
+        inputMasksForA = inputMasksForA << list_of_masks[i] | 1
+        inputMasksForB = inputMasksForB << list_of_masks[i + 32] | 1
+
+    stri = ""
+    for i in reversed(range(int(ConfigParserInstance.numOfLinks))):
+        if i < int(ConfigParserInstance.numOfLinks) - int(ConfigParserInstance.resultBitness):
+            break
+        stri = stri + str(list_of_masks[i])
+    out = int(stri, 2)
+
+    outputTableForClientA = {}
+    outputTableForClientA['config'] = {
         "numOfLinks": str(ConfigParserInstance.numOfLinks),
         "numOfNodes": str(ConfigParserInstance.numOfNodes),
-        "masksBitness": "32",
-        "inputMasks": "12",  # см описание ниже
-        "outputMasks": "24"  # см описание ниже
+        "masksBitness": str(ConfigParserInstance.AinputBitness),
+        "inputMasks": str(inputMasksForA),  # см описание ниже
+        "outputMasks": str(out)  # см описание ниже
     }
 
-    print(configForOutputTableA)
+    outputTableForClientB = {}
+    outputTableForClientB['config'] = {
+        "numOfLinks": str(ConfigParserInstance.numOfLinks),
+        "numOfNodes": str(ConfigParserInstance.numOfNodes),
+        "masksBitness": str(ConfigParserInstance.BinputBitness),
+        "inputMasks": str(inputMasksForB),  # см описание ниже
+        "outputMasks": str(out)  # см описание ниже
+    }
+
+    #print(outputTableForClientA)
+    #print(outputTableForClientB)
 
     '''
         вместо того, чтобы передавать массив маскирующих битов, можно сэкономить память и передать 
@@ -160,46 +146,23 @@ def start2_pc(body=None):  # noqa: E501
         00000000.00000000.00000000.00000001 
     '''
 
-    masks = [0] * 32
-
-    for i in range(32):
-        masks[i] = int(configForOutputTableA['config']['inputMasks']) >> i & 1
-
-    masks.reverse()
-    print(masks)
-
-
     # до этого nodes был объектом типа namespace, нам же нужно получить обратно питоновский словарь
     # на самом деле вернётся list из одного словаря, поэтому потом словарь нужно будет получить методом .pop()
-    nodesDictFromSimpleNamespace = json.loads(json.dumps(nodes, default=lambda s: vars(s)))
-    print(nodesDictFromSimpleNamespace)
+    nodesDictFromSimpleNamespaceB = json.loads(json.dumps(nodesB, default=lambda s: vars(s)))
+    nodesDictFromSimpleNamespaceA = json.loads(json.dumps(nodesA, default=lambda s: vars(s)))
+    #print(nodesDictFromSimpleNamespaceA)
+    #print(nodesDictFromSimpleNamespaceB)
 
-    outputTableForClientA = {}
-    outputTableForClientA['config'] = {
-        "numOfLinks": str(ConfigParserInstance.numOfLinks),
-        "numOfNodes": str(ConfigParserInstance.numOfNodes),
-        "masksBitness": "32",
-        "inputMasks": "12",  # см описание ниже
-        "outputMasks": "24"  # см описание ниже
-    }
     for i in range(ConfigParserInstance.numOfNodes):
         outputTableForClientA['node' + str(i + 1)] = {}
-        outputTableForClientA['node' + str(i + 1)].update(nodesDictFromSimpleNamespace.pop())
+        outputTableForClientA['node' + str(i + 1)].update(nodesDictFromSimpleNamespaceA.pop())
+
+        outputTableForClientB['node' + str(i + 1)] = {}
+        outputTableForClientB['node' + str(i + 1)].update(nodesDictFromSimpleNamespaceB.pop())
 
     PreprocessorRoutineInst.outputTableForClientA = outputTableForClientA
-
-    print("start_2pc went successful and now while loop")
+    PreprocessorRoutineInst.outputTableForClientB = outputTableForClientB
 
     PreprocessorRoutineInst.ClientATrigger = True
 
-    '''while PreprocessorRoutineInst.ClientATrigger == False or PreprocessorRoutineInst.ClientBTrigger == False:
-        # тут должен быть таймер, а по таймауту возвращать:
-        # return "Computation Error", 500
-        continue
-        '''
-    print("start_2pc is unlocked")
-    def generate():
-        yield str([PreprocessorRoutineInst.outputTableForClientA]).replace("\'", "\"")
-        yield ''
-
-    return Response(generate(), mimetype='application/json'), 200
+    return [PreprocessorRoutineInst.outputTableForClientA], 200
