@@ -4,6 +4,9 @@
 import random
 
 
+def generateRandom32int():
+    return random.randint(20194, pow(2, 32) - 10)
+
 def generateInput(N):
     i = 0
     input = []
@@ -17,9 +20,13 @@ def generateInput(N):
 
 def result_Creation():  # G = A
     result_A = []
+    hashA0 = [0] * 4
+    hashA1 = [0] * 4
     for i in range(4):
         result_A.append(random.randint(0, 1))
-    return result_A
+        hashA0[i] = generateRandom32int()
+        hashA1[i] = generateRandom32int()
+    return result_A, hashA0, hashA1
 
 
 def get_result(c, d, out):
@@ -39,6 +46,8 @@ def matrix_B_Creation(result_A, keys_list, wires, operation):
          [1, 0, 0],
          [1, 1, 0]]
     result_B = []
+    hashB0 = [0] * 4
+    hashB1 = [0] * 4
     operations = {
         "XOR": lambda x, y: x ^ y,
         "AND": lambda x, y: x & y,
@@ -49,8 +58,12 @@ def matrix_B_Creation(result_A, keys_list, wires, operation):
         for i in range(len(B)):
             B[i][2] = result_A[i] ^ (keys_list[int(wires[2])] ^ operations[operation](B[i][0] ^ keys_list[int(wires[0])], B[i][1] ^ keys_list[int(wires[1])]))
             result_B.append(B[i][2])
+            hashB1[i] = generateRandom32int()
+            hashB0[i] = generateRandom32int()
     if len(wires) == 2:
         for i in range(len(B)):
             B[i][2] = result_A[i] ^ (keys_list[int(wires[1])] ^ operations[operation](B[i][0] ^ keys_list[int(wires[0])], B[i][0] ^ keys_list[int(wires[0])]))
             result_B.append(B[i][2])
-    return result_B
+            hashB1[i] = generateRandom32int()
+            hashB0[i] = generateRandom32int()
+    return result_B, hashB0, hashB1

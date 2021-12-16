@@ -64,17 +64,38 @@ def start2_pc(body=None):  # noqa: E501
         nodesA[i].operation = [0] * 4
         nodesB[i].operation = [0] * 4
 
-        result_A = result_Creation()
+        result_A, hashA0, hashA1 = result_Creation()
         nodesA[i].operation[0] = result_A[0]
         nodesA[i].operation[1] = result_A[1]
         nodesA[i].operation[2] = result_A[2]
         nodesA[i].operation[3] = result_A[3]
 
-        result_B = matrix_B_Creation(result_A, list_of_masks, nodesA[i].inList + nodesA[i].outList, ConfigParserInstance.nodes[i].operation)
+        nodesA[i].selfHash = [0] * 4
+        nodesA[i].selfHash[0] = hashA1[0] if result_A[0] == 1 else hashA0[0]
+        nodesA[i].selfHash[1] = hashA1[1] if result_A[1] == 1 else hashA0[1]
+        nodesA[i].selfHash[2] = hashA1[2] if result_A[2] == 1 else hashA0[2]
+        nodesA[i].selfHash[3] = hashA1[3] if result_A[3] == 1 else hashA0[3]
+
+
+        result_B, hashB0, hashB1 = matrix_B_Creation(result_A, list_of_masks, nodesA[i].inList + nodesA[i].outList, ConfigParserInstance.nodes[i].operation)
         nodesB[i].operation[0] = result_B[0]
         nodesB[i].operation[1] = result_B[1]
         nodesB[i].operation[2] = result_B[2]
         nodesB[i].operation[3] = result_B[3]
+
+        nodesB[i].selfHash = [0] * 4
+        nodesB[i].selfHash[0] = hashB1[0] if result_B[0] == 1 else hashB0[0]
+        nodesB[i].selfHash[1] = hashB1[1] if result_B[1] == 1 else hashB0[1]
+        nodesB[i].selfHash[2] = hashB1[2] if result_B[2] == 1 else hashB0[2]
+        nodesB[i].selfHash[3] = hashB1[3] if result_B[3] == 1 else hashB0[3]
+
+        nodesB[i].neiHash = {}
+        nodesB[i].neiHash['bit0'] = hashA0
+        nodesB[i].neiHash['bit1'] = hashA1
+
+        nodesA[i].neiHash = {}
+        nodesA[i].neiHash['bit0'] = hashB0
+        nodesA[i].neiHash['bit1'] = hashB1
 
     inputMasksForA = 0
     inputMasksForB = 0
